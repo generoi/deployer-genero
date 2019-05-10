@@ -14,7 +14,7 @@ set('build_path', null);
  * Repository to clone during the build step.
  * @required
  */
-set('build_repository', null):
+set('build_repository', null);
 
 /**
  * Directories which can be symlinked between releases.

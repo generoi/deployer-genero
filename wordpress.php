@@ -10,17 +10,17 @@ set('bin/wp', function () {
 
 desc('Clear timber cache');
 task('cache:clear:wp:timber', function () {
-    run('cd {{release_path}} && rm -rf {{cache_dir}}/timber');
+    run('cd {{deploy_path}}/current && rm -rf {{cache_dir}}/timber');
 });
 
 desc('Clear WP Super Cache cache');
 task('cache:clear:wp:wpsc', function () {
-    run('cd {{release_path}} && rm -rf {{cache_dir}}/blogs {{cache_dir}}/meta {{cache_dir}}/supercache {{cache_dir}}/wp-cache-*');
+    run('cd {{deploy_path}}/current && rm -rf {{cache_dir}}/blogs {{cache_dir}}/meta {{cache_dir}}/supercache {{cache_dir}}/wp-cache-*');
 });
 
 desc('Clear WP Object Cache');
 task('cache:clear:wp:objectcache', function () {
-    run('cd {{release_path}} && {{bin/wp}} cache flush');
+    run('cd {{deploy_path}}/current/web/wp && {{bin/wp}} cache flush');
 });
 
 task('scaffold:env', function () {

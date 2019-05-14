@@ -31,6 +31,7 @@ task('scaffold:env', function () {
         }
     }
 
+    $dbHost = ask('DB_HOST', 'localhost');
     $dbName = ask('DB_NAME', get('scaffold_machine_name', ''));
     $dbUser = ask('DB_USER', get('scaffold_machine_name', ''));
     $dbPassword = askHiddenResponse('DB_PASSWORD');
@@ -38,15 +39,20 @@ task('scaffold:env', function () {
     $wpHome = ask('WP_HOME', 'http://{{hostname}}');
     $domainCurrentSite = ask('DOMAIN_CURRENT_SITE', '{{hostname}}');
 
-    upload(__DIR__ . '/.env.example', '{{deploy_path}}/shared/.env');
-    run("sed -i '/DB_NAME=/c\\DB_NAME=$dbName' {{deploy_path}}/shared/.env");
-    run("sed -i '/DB_USER=/c\\DB_USER=$dbUser' {{deploy_path}}/shared/.env");
-    run("sed -i '/DB_PASSWORD=/c\\DB_PASSWORD=$dbPassword' {{deploy_path}}/shared/.env");
-    run("sed -i '/WP_ENV=/c\\WP_ENV=$wpEnv' {{deploy_path}}/shared/.env");
-    run("sed -i '/WP_HOME=/c\\WP_HOME=$wpHome' {{deploy_path}}/shared/.env");
-    run("sed -i '/DOMAIN_CURRENT_SITE=/c\\DOMAIN_CURRENT_SITE=$domainCurrentSite' {{deploy_path}}/shared/.env");
+    upload(get('scaffold_env_file'), '{{deploy_path}}/shared/.env');
+    run('sed -i "/^DB_HOST=/c\\DB_HOST=' . $dbHost . '" {{deploy_path}}/shared/.env');
+    run('sed -i "/^DB_NAME=/c\\DB_NAME=' . $dbName . '" {{deploy_path}}/shared/.env');
+    run('sed -i "/^DB_USER=/c\\DB_USER=' . $dbUser . '" {{deploy_path}}/shared/.env');
+    run('sed -i "/^DB_PASSWORD=/c\\DB_PASSWORD=\'' . $dbPassword . '\'" {{deploy_path}}/shared/.env');
+    run('sed -i "/^WP_ENV=/c\\WP_ENV=' . $wpEnv . '" {{deploy_path}}/shared/.env');
+    run('sed -i "/^WP_HOME=/c\\WP_HOME=' . $wpHome . '" {{deploy_path}}/shared/.env');
+    run('sed -i "/^DOMAIN_CURRENT_SITE=/c\\DOMAIN_CURRENT_SITE=' . $domainCurrentSite . '" {{deploy_path}}/shared/.env');
 
-    // @todo salt
+    foreach (['AUTH_KEY', 'SECURE_AUTH_KEY', 'LOGGED_IN_KEY', 'NONCE_KEY', 'AUTH_SALT', 'SECURE_AUTH_SALT', 'LOGGED_IN_SALT', 'NONCE_SALT'] as $key) {
+        run('sed -i "/^' . $key . '=/c\\' . $key . '=\'' . hash('sha256', uniqid(rand(), true)) . '\'" {{deploy_path}}/shared/.env');
+    }
+
+    // @todo scaffold database.
 });
 
 desc('Clean directories which are emptied by dropin installer');

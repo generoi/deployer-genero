@@ -10,7 +10,7 @@ This deploy workflow clones the local (or remote) git repository into `.build/`,
 
 ### Example `deploy.php`
 
-```
+```php
 namespace Deployer;
 
 require 'recipe/wordpress.php';
@@ -23,6 +23,7 @@ require 'vendor/generoi/deployer-genero/setup.php';
 require 'vendor/generoi/deployer-genero/wordpress.php';
 
 set('scaffold_machine_name', 'project-name');
+set('scaffold_env_file', __DIR__ . '/.env.example');
 set('theme_dir', 'web/app/themes/project-name');
 
 set('shared_files', ['.env']);
@@ -122,9 +123,9 @@ task('deploy', [
 ]);
 ```
 
-### Provided commands:
+### Provided commands
 
-```
+```sh
   build                       Build release locally
   setup                       Setup initial deploy
   ssh                         Connect to host through ssh

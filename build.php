@@ -8,34 +8,34 @@ use Symfony\Component\Console\Input\InputOption;
  * Path where build files will be located
  * @required
  */
-set('build_path', null);
+set('build_path', get('build_path', null));
 
 /**
  * Repository to clone during the build step.
  * @required
  */
-set('build_repository', null);
+set('build_repository', get('build_repository', null));
 
 /**
  * Directories which can be symlinked between releases.
  */
-set('build_shared_dirs', ['node_modules']);
+set('build_shared_dirs', get('build_shared_dirs', ['node_modules']));
 
 /**
  * Directories which have to be rebuilt between releases.
  */
-set('build_copy_dirs', ['vendor']);
+set('build_copy_dirs', get('build_copy_dirs', ['vendor']));
 
 
 /**
  * Directory where build artifact will be located.
  */
-set('build_artifact_dir', '{{build_path}}/artifact');
+set('build_artifact_dir', get('build_artifact_dir', '{{build_path}}/artifact'));
 
 /**
  * Files which will be excluded from the build artifact that's deployed.
  */
-set('build_artifact_exclude', [
+set('build_artifact_exclude', get('build_artifact_exclude', [
     '.git',
     'node_modules',
     '*.sql',
@@ -47,7 +47,7 @@ set('build_artifact_exclude', [
     '/*.xml',
     '/*.yml',
     '/Vagrantfile*',
-]);
+]));
 
 /**
  * --quick flag to skip some time consuming tasks that aren't always needed.
@@ -68,7 +68,7 @@ task('build:artifact', function () {
         'filter-file'   => false,
         'filter-perdir' => false,
         'flags'         => 'r', // Recursive
-        'options'       => ['delete'],
+        'options'       => ['delete', 'links'],
         'timeout'       => 3600,
     ]);
 

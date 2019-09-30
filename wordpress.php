@@ -2,11 +2,11 @@
 
 namespace Deployer;
 
-set('cache_dir', 'web/app/cache');
+set('cache_dir', get('cache_dir', 'web/app/cache'));
 
-set('bin/wp', function () {
+set('bin/wp', get('bin/wp', function () {
     return run('which wp');
-});
+}));
 
 desc('Clear timber cache');
 task('cache:clear:wp:timber', function () {
@@ -20,7 +20,17 @@ task('cache:clear:wp:wpsc', function () {
 
 desc('Clear WP Object Cache');
 task('cache:clear:wp:objectcache', function () {
-    run('cd {{deploy_path}}/current/web/wp && {{bin/wp}} cache flush');
+    run('cd {{deploy_path}}/current && {{bin/wp}} cache flush --path web/wp');
+});
+
+desc('Clear Acorn Caches');
+task('cache:clear:wp:acorn', function () {
+    run('cd {{deploy_path}}/current && {{bin/wp}} acorn optimize:clear --path web/wp');
+});
+
+desc('Generate Acorn Caches');
+task('cache:wp:acorn', function () {
+    run('cd {{deploy_path}}/current && {{bin/wp}} acorn optimize --path web/wp');
 });
 
 task('scaffold:env', function () {

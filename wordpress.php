@@ -20,17 +20,17 @@ task('cache:clear:wp:wpsc', function () {
 
 desc('Clear WP Object Cache');
 task('cache:clear:wp:objectcache', function () {
-    run('cd {{deploy_path}}/current && {{bin/wp}} cache flush --path web/wp');
+    run('cd {{deploy_path}}/current && {{bin/wp}} cache flush --path=web/wp');
 });
 
 desc('Clear Acorn Caches');
 task('cache:clear:wp:acorn', function () {
-    run('cd {{deploy_path}}/current && {{bin/wp}} acorn optimize:clear --path web/wp');
+    run('cd {{deploy_path}}/current && {{bin/wp}} acorn optimize:clear --path=web/wp');
 });
 
 desc('Generate Acorn Caches');
 task('cache:wp:acorn', function () {
-    run('cd {{deploy_path}}/current && {{bin/wp}} acorn optimize --path web/wp');
+    run('cd {{deploy_path}}/current && {{bin/wp}} acorn optimize --path=web/wp');
 });
 
 task('scaffold:env', function () {

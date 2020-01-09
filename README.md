@@ -6,7 +6,7 @@ This deploy workflow clones the local (or remote) git repository into `.build/`,
 
 ### Installation
 
-    composer require generoi/genero-deployer --dev
+    composer require generoi/deployer-genero --dev
 
 ### Example `deploy.php`
 

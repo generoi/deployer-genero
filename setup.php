@@ -4,11 +4,9 @@ namespace Deployer;
 
 desc('Setup initial deploy');
 task('setup', [
-    'deploy',
+    'scaffold:env',
 ]);
 
 desc('Scaffold an environment file');
 task('scaffold:env', function () {
 });
-
-before('setup', 'scaffold:env');

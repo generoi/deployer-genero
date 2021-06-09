@@ -15,22 +15,22 @@ task('cache:clear:wp:timber', function () {
 
 desc('Clear WP Super Cache cache');
 task('cache:clear:wp:wpsc', function () {
-    run('cd {{deploy_path}}/current && rm -rf {{cache_dir}}/blogs {{cache_dir}}/meta {{cache_dir}}/supercache {{cache_dir}}/wp-cache-*');
+    run('cd {{deploy_path}}/current && rm -rf {{cache_dir}}/{blogs,meta,supercache,wp-cache-*}');
 });
 
 desc('Clear WP Object Cache');
 task('cache:clear:wp:objectcache', function () {
-    run('cd {{deploy_path}}/current && {{bin/wp}} cache flush --path=web/wp');
+    run('cd {{deploy_path}}/current/web && {{bin/wp}} cache flush');
 });
 
 desc('Clear Acorn Caches');
 task('cache:clear:wp:acorn', function () {
-    run('cd {{deploy_path}}/current && {{bin/wp}} acorn optimize:clear --path=web/wp');
+    run('cd {{deploy_path}}/current/web && {{bin/wp}} acorn optimize:clear');
 });
 
 desc('Generate Acorn Caches');
 task('cache:wp:acorn', function () {
-    run('cd {{deploy_path}}/current && {{bin/wp}} acorn optimize --path=web/wp');
+    run('cd {{deploy_path}}/current/web && {{bin/wp}} acorn optimize');
 });
 
 task('scaffold:env', function () {

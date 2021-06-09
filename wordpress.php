@@ -40,7 +40,7 @@ task('cache:clear:kinsta', function () {
 
 
 task('scaffold:env', function () {
-    if (test('-f {{deploy_path}}/shared/.env')) {
+    if (test('[ -f {{deploy_path}}/shared/.env ]')) {
         $confirm = askConfirmation('Environment file already exists, are you usre you want to rewrite it?');
         if (!$confirm) {
             return;

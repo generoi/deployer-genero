@@ -33,6 +33,12 @@ task('cache:wp:acorn', function () {
     run('cd {{deploy_path}}/current/web && {{bin/wp}} acorn optimize');
 });
 
+desc('Clear Kinsta Caches');
+task('cache:clear:kinsta', function () {
+    run('curl {{ url }}/kinsta-clear-cache-all/');
+});
+
+
 task('scaffold:env', function () {
     if (test('-f {{deploy_path}}/shared/.env')) {
         $confirm = askConfirmation('Environment file already exists, are you usre you want to rewrite it?');

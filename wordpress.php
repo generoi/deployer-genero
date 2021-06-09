@@ -47,13 +47,15 @@ task('scaffold:env', function () {
         }
     }
 
+    $url = get('url', 'https://');
+
     $dbHost = ask('DB_HOST', 'localhost');
     $dbName = ask('DB_NAME', get('scaffold_machine_name', ''));
     $dbUser = ask('DB_USER', get('scaffold_machine_name', ''));
     $dbPassword = askHiddenResponse('DB_PASSWORD');
-    $wpEnv = ask('WP_ENV', 'development');
-    $wpHome = ask('WP_HOME', 'http://{{hostname}}');
-    $domainCurrentSite = ask('DOMAIN_CURRENT_SITE', '{{hostname}}');
+    $wpEnv = ask('WP_ENV', currentHost()->getAlias());
+    $wpHome = ask('WP_HOME', $url);
+    $domainCurrentSite = ask('DOMAIN_CURRENT_SITE', parse_url($url, PHP_URL_HOST));
 
     run('mkdir -p {{deploy_path}}/shared');
     upload(get('scaffold_env_file'), '{{deploy_path}}/shared/.env');

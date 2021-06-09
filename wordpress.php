@@ -55,6 +55,7 @@ task('scaffold:env', function () {
     $wpHome = ask('WP_HOME', 'http://{{hostname}}');
     $domainCurrentSite = ask('DOMAIN_CURRENT_SITE', '{{hostname}}');
 
+    run('mkdir -p {{deploy_path}}/shared');
     upload(get('scaffold_env_file'), '{{deploy_path}}/shared/.env');
     run('sed -i "/^DB_HOST=/c\\DB_HOST=' . $dbHost . '" {{deploy_path}}/shared/.env');
     run('sed -i "/^DB_NAME=/c\\DB_NAME=' . $dbName . '" {{deploy_path}}/shared/.env');
@@ -72,7 +73,7 @@ task('scaffold:env', function () {
 });
 
 desc('Clean directories which are emptied by dropin installer');
-task('cleanup:dropin', function () {
+task('deploy:cleanup:dropin', function () {
     run('cd {{release_path}} && rm -rf vendor/koodimonni-language');
     run('cd {{release_path}} && rm -rf vendor/koodimonni-plugin-language');
     run('cd {{release_path}} && rm -rf vendor/koodimonni-theme-language');
@@ -82,4 +83,4 @@ task('cleanup:dropin', function () {
  * We need to prune the empty directories left by dropin installer or else
  * they wont be downloaded again.
  */
-before('deploy:vendors', 'cleanup:dropin');
+before('deploy:vendors', 'deploy:cleanup:dropin');

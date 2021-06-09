@@ -86,8 +86,8 @@ task('build', function () {
     set('shared_dirs', get('build_shared_dirs'));
     set('copy_dirs', get('build_copy_dirs'));
 
-    invoke('deploy:prepare');
-    invoke('cleanup');
+    invoke('deploy:setup');
+    invoke('deploy:cleanup');
     invoke('deploy:release');
     invoke('deploy:update_code');
     invoke('deploy:copy_dirs');

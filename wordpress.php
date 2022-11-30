@@ -66,8 +66,6 @@ task('scaffold:env', function () {
     $dbName = ask('DB_NAME', get('scaffold_machine_name', ''));
     $dbUser = ask('DB_USER', get('scaffold_machine_name', ''));
     $dbPassword = askHiddenResponse('DB_PASSWORD');
-    $wpEnv = ask('WP_ENV', currentHost()->getAlias());
-    $wpHome = ask('WP_HOME', $url);
     $domainCurrentSite = ask('DOMAIN_CURRENT_SITE', parse_url($url, PHP_URL_HOST));
 
     run('mkdir -p {{deploy_path}}/shared');
@@ -76,7 +74,6 @@ task('scaffold:env', function () {
     run('sed -i "/^DB_NAME=/c\\DB_NAME=' . $dbName . '" {{deploy_path}}/shared/.env');
     run('sed -i "/^DB_USER=/c\\DB_USER=' . $dbUser . '" {{deploy_path}}/shared/.env');
     run('sed -i "/^DB_PASSWORD=/c\\DB_PASSWORD=\'' . $dbPassword . '\'" {{deploy_path}}/shared/.env');
-    run('sed -i "/^WP_ENV=/c\\WP_ENV=' . $wpEnv . '" {{deploy_path}}/shared/.env');
     run('sed -i "/^DOMAIN_CURRENT_SITE=/c\\DOMAIN_CURRENT_SITE=' . $domainCurrentSite . '" {{deploy_path}}/shared/.env');
 
     foreach (['AUTH_KEY', 'SECURE_AUTH_KEY', 'LOGGED_IN_KEY', 'NONCE_KEY', 'AUTH_SALT', 'SECURE_AUTH_SALT', 'LOGGED_IN_SALT', 'NONCE_SALT'] as $key) {

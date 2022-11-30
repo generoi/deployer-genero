@@ -38,6 +38,19 @@ task('cache:clear:kinsta', function () {
     run('curl {{ url }}/kinsta-clear-cache-all/');
 });
 
+task('wordpress:set-wp-home', function () {
+    // add WP_HOME to environment file
+    $file = realpath($_SERVER['DOCUMENT_ROOT']) . '/config/environments/' . currentHost()->getAlias() . '.php';
+    $lines = file($file);
+    $newLines = [];
+    foreach ($lines as $line) {
+        if (strpos($line, "Config::define('WP_HOME'") === false) {
+            $newLines[] = $line;
+        }
+    }
+    $newLines[] = 'Config::define(\'WP_HOME\', \'' . get('url', 'https://') . '\');';
+    file_put_contents($file, implode('', $newLines));
+});
 
 task('scaffold:env', function () {
     if (test('[ -f {{deploy_path}}/shared/.env ]')) {
@@ -64,7 +77,6 @@ task('scaffold:env', function () {
     run('sed -i "/^DB_USER=/c\\DB_USER=' . $dbUser . '" {{deploy_path}}/shared/.env');
     run('sed -i "/^DB_PASSWORD=/c\\DB_PASSWORD=\'' . $dbPassword . '\'" {{deploy_path}}/shared/.env');
     run('sed -i "/^WP_ENV=/c\\WP_ENV=' . $wpEnv . '" {{deploy_path}}/shared/.env');
-    run('sed -i "/^WP_HOME=/c\\WP_HOME=' . $wpHome . '" {{deploy_path}}/shared/.env');
     run('sed -i "/^DOMAIN_CURRENT_SITE=/c\\DOMAIN_CURRENT_SITE=' . $domainCurrentSite . '" {{deploy_path}}/shared/.env');
 
     foreach (['AUTH_KEY', 'SECURE_AUTH_KEY', 'LOGGED_IN_KEY', 'NONCE_KEY', 'AUTH_SALT', 'SECURE_AUTH_SALT', 'LOGGED_IN_SALT', 'NONCE_SALT'] as $key) {

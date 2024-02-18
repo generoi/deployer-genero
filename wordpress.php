@@ -35,7 +35,7 @@ task('cache:wp:acorn', function () {
 
 desc('Clear Kinsta Caches');
 task('cache:clear:kinsta', function () {
-    run('curl {{ url }}/kinsta-clear-cache-all/');
+    run('curl http://localhost/kinsta-clear-cache-all/');
 });
 
 

@@ -56,5 +56,5 @@ task('rsync:verify', function () {
     }
 
     // Exit if there are any file changes reported
-    runLocally("if [ $({$rsyncCmd} | wc -c) -ne 0 ]; then echo 'rsync integrity check failed'; exit 1; fi", $config);
+    runLocally("if [ $({$rsyncCmd} | wc -c) -ne 0 ]; then echo 'rsync integrity check failed'; exit 1; fi", timeout: $config['timeout'] ?? 3600);
 });

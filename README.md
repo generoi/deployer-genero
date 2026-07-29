@@ -123,42 +123,6 @@ task('deploy', [
 ]);
 ```
 
-### PHP execution guard
-
-Apache sites deny direct execution of non entry point `.php` files from
-`.htaccess`. nginx ignores `.htaccess`, so on nginx hosting (Kinsta) the same
-policy has to be enforced one layer down, in PHP, via `auto_prepend_file`.
-
-Ship a guard script in the site repository at `config/php-guard.php` and add
-the ini file to `shared_files`:
-
-```php
-set('shared_files', ['.env', 'web/.user.ini']);
-```
-
-`scaffold:user_ini` then runs as part of `setup`. For a site that is already
-deployed, run it once:
-
-```sh
-./vendor/bin/dep scaffold:user_ini production
-```
-
-The guard script itself stays in the site repo, because the allowlist of
-permitted entry points differs between sites. Override the paths if needed:
-
-```php
-set('php_guard_file', 'config/php-guard.php');
-set('php_guard_user_ini', '{{deploy_path}}/shared/web/.user.ini');
-```
-
-The task skips with a notice if the guard script is not present, rather than
-writing a `.user.ini` pointing at a missing file — that would leave PHP logging
-a warning on every request while protecting nothing.
-
-Two things to know: `.user.ini` is cached for `user_ini.cache_ttl` (300s on
-Kinsta), and a missing or empty one fails silently. Verify the guard is
-actually active rather than assuming it from a successful deploy.
-
 ### Provided commands
 
 ```sh

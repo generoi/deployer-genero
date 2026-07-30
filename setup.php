@@ -4,6 +4,7 @@ namespace Deployer;
 
 desc('Setup initial deploy');
 task('setup', [
+    'wordpress:set-wp-home',
     'scaffold:env',
 ]);
 

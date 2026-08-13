@@ -2,6 +2,8 @@
 
 namespace Deployer;
 
+use function Deployer\Support\deployer_root;
+
 /**
  * Shared local-build implementation.
  *
@@ -20,31 +22,19 @@ namespace Deployer;
  */
 
 /*
- * Resolved lazily on purpose: __DIR__ in this file is the package directory
- * inside vendor/, not the project root, so these must be computed when the task
- * runs rather than when the file is imported.
+ * deployer_root() is dirname(DEPLOYER_DEPLOY_FILE) — the directory holding
+ * deploy.php — which is exactly what __DIR__ meant when this lived there. It is
+ * also correct when dep is invoked from a subdirectory, and honours the
+ * DEPLOYER_ROOT environment variable.
  *
- * Walking up to the repository root rather than trusting getcwd() means `dep`
- * still builds the right tree when invoked from a subdirectory. `.git` is
- * matched with file_exists() rather than is_dir() because in a worktree it is a
- * file pointing at the real git dir.
+ * Using __DIR__ here would resolve to vendor/generoi/deployer-genero instead.
  */
 set('build_repository', function () {
-    $dir = getcwd();
-
-    while ($dir !== dirname($dir)) {
-        if (file_exists($dir.'/.git')) {
-            return $dir;
-        }
-
-        $dir = dirname($dir);
-    }
-
-    throw new \RuntimeException('build_repository: no git repository found above '.getcwd());
+    return deployer_root();
 });
 
-// Named after the repository directory, so concurrent builds of different
-// projects cannot collide in /tmp.
+// Named after the project directory, so concurrent builds of different projects
+// cannot collide in /tmp.
 set('build_path', function () {
     return '/tmp/dep-'.basename(get('build_repository'));
 });

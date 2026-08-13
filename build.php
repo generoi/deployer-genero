@@ -21,15 +21,32 @@ namespace Deployer;
 
 /*
  * Resolved lazily on purpose: __DIR__ in this file is the package directory
- * inside vendor/, not the project root, so the value must be computed when the
- * task runs rather than when the file is imported.
+ * inside vendor/, not the project root, so these must be computed when the task
+ * runs rather than when the file is imported.
+ *
+ * Walking up to the repository root rather than trusting getcwd() means `dep`
+ * still builds the right tree when invoked from a subdirectory. `.git` is
+ * matched with file_exists() rather than is_dir() because in a worktree it is a
+ * file pointing at the real git dir.
  */
 set('build_repository', function () {
-    return getcwd();
+    $dir = getcwd();
+
+    while ($dir !== dirname($dir)) {
+        if (file_exists($dir.'/.git')) {
+            return $dir;
+        }
+
+        $dir = dirname($dir);
+    }
+
+    throw new \RuntimeException('build_repository: no git repository found above '.getcwd());
 });
 
+// Named after the repository directory, so concurrent builds of different
+// projects cannot collide in /tmp.
 set('build_path', function () {
-    return '/tmp/dep-'.basename(getcwd());
+    return '/tmp/dep-'.basename(get('build_repository'));
 });
 
 set('build_artifact_dir', '{{build_path}}/artifact');

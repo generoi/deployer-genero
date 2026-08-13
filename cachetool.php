@@ -36,7 +36,7 @@ set('bin/cachetool', function () {
 
     if (! test("[ -f $binary ]")) {
         run('mkdir -p {{deploy_path}}/.dep');
-        run("curl -fsSL --retry 3 --retry-all-errors {{cachetool_url}} -o $binary");
+        run("curl -fsSL --retry 3 {{cachetool_url}} -o $binary");
     }
 
     return $binary;

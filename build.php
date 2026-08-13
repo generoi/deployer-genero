@@ -54,16 +54,22 @@ set('build_artifact_exclude', [
     '/*.yml',
 ]);
 
+/*
+ * These run on the machine invoking dep, so they must use its own git and
+ * composer. Deployer's {{bin/git}} / {{bin/composer}} are resolved against the
+ * REMOTE host even inside runLocally(), and {{bin/composer}} will install
+ * composer.phar onto the production server when it is not found there.
+ */
 desc('Clone the working tree into a clean build path');
 task('build:setup', function () {
     runLocally('rm -rf {{build_path}}');
     runLocally('mkdir -p {{build_path}}');
-    runLocally('{{bin/git}} clone {{build_repository}} {{build_path}}');
+    runLocally('git clone {{build_repository}} {{build_path}}');
 });
 
 desc('Install Composer dependencies into the build');
 task('build:composer', function () {
-    runLocally('cd {{build_path}} && {{bin/composer}} {{composer_action}} {{composer_options}}');
+    runLocally('cd {{build_path}} && composer {{composer_action}} {{composer_options}}');
 });
 
 desc('Copy the build into a sanitised artifact directory');

@@ -4,14 +4,13 @@ namespace Deployer;
 
 desc('Make filesystem read-only');
 task('readonly', function () {
-    $dirs = join(' ', get('writable_dirs'));
+    $dirs = implode(' ', get('writable_dirs'));
 
     cd('{{release_path}}');
     // Use find instead
     run('chmod -R a-w .');
     run("chmod -R {{writable_chmod_mode}} $dirs");
 });
-
 
 desc('Make expired releases writable so they can be removed');
 task('readonly:cleanup:writable', function () {
@@ -25,7 +24,7 @@ task('readonly:cleanup:writable', function () {
 
     while ($keep > 0) {
         array_shift($releases);
-        --$keep;
+        $keep--;
     }
 
     foreach ($releases as $release) {

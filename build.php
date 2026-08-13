@@ -2,8 +2,6 @@
 
 namespace Deployer;
 
-use function Deployer\Support\deployer_root;
-
 /**
  * Shared local-build implementation.
  *
@@ -22,15 +20,19 @@ use function Deployer\Support\deployer_root;
  */
 
 /*
- * deployer_root() is dirname(DEPLOYER_DEPLOY_FILE) — the directory holding
- * deploy.php — which is exactly what __DIR__ meant when this lived there. It is
- * also correct when dep is invoked from a subdirectory, and honours the
- * DEPLOYER_ROOT environment variable.
+ * The project root, computed from this file's own location: the package is
+ * installed at <root>/vendor/generoi/deployer-genero, so the root is three
+ * levels up.
  *
- * Using __DIR__ here would resolve to vendor/generoi/deployer-genero instead.
+ * __DIR__ cannot be used directly (it is the package directory), and
+ * Deployer\Support\deployer_root() cannot be used either — it does not exist
+ * in Deployer 7, which half the fleet still runs. getcwd() is the fallback for
+ * a non-standard install location.
  */
 set('build_repository', function () {
-    return deployer_root();
+    $root = dirname(__DIR__, 3);
+
+    return is_file($root.'/composer.json') ? $root : getcwd();
 });
 
 // Named after the project directory, so concurrent builds of different projects

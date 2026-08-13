@@ -79,3 +79,25 @@ task('deploy:update_code', function () {
     // Nothing to do: the git repository is never stored on the remote, the
     // sanitised artifact is rsynced instead.
 });
+
+/*
+ * A sane default, in the same spirit as recipe/common.php shipping a minimal
+ * `deploy` that recipe/laravel.php overrides.
+ *
+ * `build:theme` is not included: it is the one step that genuinely differs per
+ * site (16 distinct implementations across the fleet). A project with a theme
+ * build overrides this list and slots it in:
+ *
+ *     task('build', [
+ *         'build:setup',
+ *         'build:composer',
+ *         'build:theme',
+ *         'build:artifact',
+ *     ]);
+ */
+desc('Build release locally');
+task('build', [
+    'build:setup',
+    'build:composer',
+    'build:artifact',
+]);

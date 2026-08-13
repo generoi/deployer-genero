@@ -75,7 +75,6 @@ task('build:artifact', function () {
     runLocally("rsync -r --delete --links $exclude '{{build_path}}/' '{{build_artifact_dir}}/'");
 });
 
-
 /*
  * A sane default, in the same spirit as recipe/common.php shipping a minimal
  * `deploy` that recipe/laravel.php overrides.

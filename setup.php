@@ -8,5 +8,4 @@ task('setup', [
 ]);
 
 desc('Scaffold an environment file');
-task('scaffold:env', function () {
-});
+task('scaffold:env', function () {});

@@ -5,7 +5,7 @@
     "homepage": "https://github.com/generoi/deployer-genero",
     "authors": [
         {
-            "name": "Oskar Schöldström",
+            "name": "Oskar Sch\u00f6ldstr\u00f6m",
             "email": "public@oxy.fi"
         }
     ],
@@ -20,11 +20,15 @@
         "deployer/deployer": "^7.0|^8.0"
     },
     "require-dev": {
-        "squizlabs/php_codesniffer": "^2.5.1"
+        "laravel/pint": "^1.27"
     },
     "scripts": {
+        "lint": [
+            "pint --test"
+        ],
         "test": [
-            "vendor/bin/phpcs ."
+            "@composer validate --no-check-all",
+            "@composer lint"
         ]
     }
 }

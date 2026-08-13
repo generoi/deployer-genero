@@ -38,11 +38,10 @@ task('cache:clear:kinsta', function () {
     run('curl http://localhost/kinsta-clear-cache-all/');
 });
 
-
 task('scaffold:env', function () {
     if (test('[ -f {{deploy_path}}/shared/.env ]')) {
         $confirm = askConfirmation('Environment file already exists, are you usre you want to rewrite it?');
-        if (!$confirm) {
+        if (! $confirm) {
             return;
         }
     }
@@ -59,16 +58,16 @@ task('scaffold:env', function () {
 
     run('mkdir -p {{deploy_path}}/shared');
     upload(get('scaffold_env_file'), '{{deploy_path}}/shared/.env');
-    run('sed -i "/^DB_HOST=/c\\DB_HOST=' . $dbHost . '" {{deploy_path}}/shared/.env');
-    run('sed -i "/^DB_NAME=/c\\DB_NAME=' . $dbName . '" {{deploy_path}}/shared/.env');
-    run('sed -i "/^DB_USER=/c\\DB_USER=' . $dbUser . '" {{deploy_path}}/shared/.env');
-    run('sed -i "/^DB_PASSWORD=/c\\DB_PASSWORD=\'' . $dbPassword . '\'" {{deploy_path}}/shared/.env');
-    run('sed -i "/^WP_ENV=/c\\WP_ENV=' . $wpEnv . '" {{deploy_path}}/shared/.env');
-    run('sed -i "/^WP_HOME=/c\\WP_HOME=' . $wpHome . '" {{deploy_path}}/shared/.env');
-    run('sed -i "/^DOMAIN_CURRENT_SITE=/c\\DOMAIN_CURRENT_SITE=' . $domainCurrentSite . '" {{deploy_path}}/shared/.env');
+    run('sed -i "/^DB_HOST=/c\\DB_HOST='.$dbHost.'" {{deploy_path}}/shared/.env');
+    run('sed -i "/^DB_NAME=/c\\DB_NAME='.$dbName.'" {{deploy_path}}/shared/.env');
+    run('sed -i "/^DB_USER=/c\\DB_USER='.$dbUser.'" {{deploy_path}}/shared/.env');
+    run('sed -i "/^DB_PASSWORD=/c\\DB_PASSWORD=\''.$dbPassword.'\'" {{deploy_path}}/shared/.env');
+    run('sed -i "/^WP_ENV=/c\\WP_ENV='.$wpEnv.'" {{deploy_path}}/shared/.env');
+    run('sed -i "/^WP_HOME=/c\\WP_HOME='.$wpHome.'" {{deploy_path}}/shared/.env');
+    run('sed -i "/^DOMAIN_CURRENT_SITE=/c\\DOMAIN_CURRENT_SITE='.$domainCurrentSite.'" {{deploy_path}}/shared/.env');
 
     foreach (['AUTH_KEY', 'SECURE_AUTH_KEY', 'LOGGED_IN_KEY', 'NONCE_KEY', 'AUTH_SALT', 'SECURE_AUTH_SALT', 'LOGGED_IN_SALT', 'NONCE_SALT'] as $key) {
-        run('sed -i "/^' . $key . '=/c\\' . $key . '=\'' . hash('sha256', uniqid(rand(), true)) . '\'" {{deploy_path}}/shared/.env');
+        run('sed -i "/^'.$key.'=/c\\'.$key.'=\''.hash('sha256', uniqid(rand(), true)).'\'" {{deploy_path}}/shared/.env');
     }
 
     // @todo scaffold database.

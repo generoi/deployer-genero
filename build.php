@@ -75,10 +75,6 @@ task('build:artifact', function () {
     runLocally("rsync -r --delete --links $exclude '{{build_path}}/' '{{build_artifact_dir}}/'");
 });
 
-task('deploy:update_code', function () {
-    // Nothing to do: the git repository is never stored on the remote, the
-    // sanitised artifact is rsynced instead.
-});
 
 /*
  * A sane default, in the same spirit as recipe/common.php shipping a minimal

@@ -37,8 +37,15 @@ set('build_repository', function () {
 
 // Named after the project directory, so concurrent builds of different projects
 // cannot collide in /tmp.
+//
+// On GitHub Actions, build under $RUNNER_TEMP instead: from ubuntu-26.04 /tmp is
+// a RAM-backed tmpfs with a ~6 GB per-user quota, which a full build exceeds
+// ("Disk quota exceeded"). $RUNNER_TEMP is on the runner's disk and emptied
+// after every job. https://github.com/actions/runner-images/issues/14777
 set('build_path', function () {
-    return '/tmp/dep-'.basename(get('build_repository'));
+    $tmp = getenv('RUNNER_TEMP') ?: '/tmp';
+
+    return rtrim($tmp, '/').'/dep-'.basename(get('build_repository'));
 });
 
 set('build_artifact_dir', '{{build_path}}/artifact');

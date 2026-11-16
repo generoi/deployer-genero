@@ -35,7 +35,17 @@ task('cache:wp:acorn', function () {
 
 desc('Clear Kinsta Caches');
 task('cache:clear:kinsta', function () {
-    run('curl http://localhost/kinsta-clear-cache-all/');
+    // Kinsta's page and Edge cache, never the CDN: the request and answer
+    // kinsta-mu-plugins' `wp kinsta cache purge --site` uses. Any other answer
+    // means nothing was purged, so say so instead of passing silently.
+    $response = rtrim(run("curl -sSk -w '\\n%{http_code}' https://localhost/kinsta-clear-cache-all"));
+    $split = (int) strrpos($response, "\n");
+    $body = trim(substr($response, 0, $split));
+    $code = trim(substr($response, $split));
+
+    if ($code !== '200' || $body !== 'Cache has been cleared.') {
+        warning("Kinsta page cache was not cleared: HTTP $code $body");
+    }
 });
 
 task('scaffold:env', function () {

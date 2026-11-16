@@ -28,6 +28,12 @@ namespace Deployer;
  *         'cache:purge',
  *     ]);
  *
+ * Keep that order on every site. Acorn first: `acorn optimize` deletes the
+ * compiled Blade loaders whose paths WooCommerce keeps in the object cache, so
+ * flushing that cache afterwards drops paths to deleted loaders. The page cache
+ * last, once the release renders from warm caches. `cache:clear:opcache` comes
+ * from `cachetool.php`.
+ *
  * A deploy overrides the site's mode with `dep deploy production -o purge=hard`.
  */
 set('purge', 'soft');
@@ -113,6 +119,12 @@ task('cache:purge', function () {
     }
 
     set('purge_hard', $mode === 'hard');
+
+    if (get('purge_tasks') === []) {
+        warning("purge: $mode, but purge_tasks is empty, so nothing was purged");
+
+        return;
+    }
 
     // Best-effort: a CDN hiccup must not fail a deploy whose release is live.
     foreach (get('purge_tasks') as $task) {

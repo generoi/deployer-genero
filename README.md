@@ -123,6 +123,14 @@ task('deploy', [
 ]);
 ```
 
+### Purging page caches on deploy
+
+`purge.php` purges the page and edge caches as the `purge` setting says:
+`soft` (the default), `hard`, `auto` (only when the built assets changed) or
+`none`. A site sets its own default in `deploy.php`, and a deploy overrides it
+with `-o purge=hard`. The modes and the setup are documented in
+[`purge.php`](purge.php).
+
 ### Provided commands
 
 ```sh

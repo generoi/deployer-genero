@@ -84,7 +84,17 @@ task('cache:clear:wp:objectcache:only', function () {
 
 desc('Flush sage-cachetags (Cloudflare, Fastly, …)');
 task('cache:clear:cachetags', function () {
-    $hard = get('purge_hard') ? ' --hard' : '';
+    $hard = '';
+
+    // --hard arrived in sage-cachetags 3.2; WP-CLI rejects it on older ones.
+    if (get('purge_hard')) {
+        if (test('cd {{deploy_path}}/current/web && {{bin/wp}} help cachetags flush | grep -q -- --hard')) {
+            $hard = ' --hard';
+        } else {
+            warning('sage-cachetags has no flush --hard, so a soft invalidator still purges softly');
+        }
+    }
+
     run("cd {{deploy_path}}/current/web && {{bin/wp}} cachetags flush$hard");
 });
 

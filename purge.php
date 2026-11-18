@@ -9,8 +9,12 @@ namespace Deployer;
  *   can (sage-cachetags with a soft invalidator), so visitors are served the old
  *   page while it revalidates; Kinsta has no soft purge, so it is always emptied.
  * - `hard`: the same, but `wp cachetags flush --hard`, so nothing old is served.
- * - `auto`: `hard` when the built assets changed, otherwise nothing. Use it where
- *   a deploy that only changes PHP doesn't need every page re-rendered.
+ * - `auto`: `hard` when the built assets or a file in `purge_files` changed,
+ *   otherwise nothing. Use it where a deploy that only changes PHP doesn't need
+ *   every page re-rendered. `purge_files` defaults to `composer.lock`: a plugin
+ *   update can change the markup of every page without touching the theme build
+ *   (Gravity Forms 3.2.3 changed its form state checksum, so cached pages kept
+ *   serving forms whose submissions failed validation).
  * - `none`: purge nothing.
  *
  * Rollbacks don't check the assets, so under `auto` they always purge.
@@ -35,10 +39,15 @@ namespace Deployer;
  * from `cachetool.php`.
  *
  * A deploy overrides the site's mode with `dep deploy production -o purge=hard`.
+ * To purge without deploying, run the task on its own; it purges the live
+ * release with the site's own `purge_tasks`:
+ *
+ *     vendor/bin/dep cache:purge production -o purge=hard
  */
 set('purge', 'soft');
 set('purge_tasks', []);
 set('assets_dirs', ['{{theme_dir}}/build']);
+set('purge_files', ['composer.lock']);
 set('assets_changed', true);
 set('purge_hard', false);
 
@@ -64,6 +73,16 @@ function assetsChecksum(string $root): string
     return run("{ cd $root && find $dirs -type f -exec md5sum {} +; } 2>/dev/null | LC_ALL=C sort | md5sum");
 }
 
+/**
+ * Checksum of the `purge_files` in one release. A missing file hashes as empty.
+ */
+function purgeFilesChecksum(string $root): string
+{
+    $files = implode(' ', array_map(fn ($file) => escapeshellarg(parse($file)), get('purge_files')));
+
+    return run("{ cd $root && md5sum $files; } 2>/dev/null | md5sum");
+}
+
 desc('Check whether the built assets changed');
 task('cache:check_assets', function () {
     // Fail an invalid mode before the release goes live, not after.
@@ -78,7 +97,10 @@ task('cache:check_assets', function () {
         }
     }
 
-    set('assets_changed', assetsChecksum('{{current_path}}') !== assetsChecksum('{{release_path}}'));
+    $assetsChanged = assetsChecksum('{{current_path}}') !== assetsChecksum('{{release_path}}');
+    $filesChanged = get('purge_files') !== [] && purgeFilesChecksum('{{current_path}}') !== purgeFilesChecksum('{{release_path}}');
+
+    set('assets_changed', $assetsChanged || $filesChanged);
 });
 
 desc('Flush the object cache, without purging the page cache');

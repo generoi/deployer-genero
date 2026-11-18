@@ -126,10 +126,23 @@ task('deploy', [
 ### Purging page caches on deploy
 
 `purge.php` purges the page and edge caches as the `purge` setting says:
-`soft` (the default), `hard`, `auto` (only when the built assets changed) or
-`none`. A site sets its own default in `deploy.php`, and a deploy overrides it
-with `-o purge=hard`. The modes and the setup are documented in
-[`purge.php`](purge.php).
+`soft` (the default), `hard`, `auto` (only when the built assets or
+`composer.lock` changed) or `none`. A site sets its own default in
+`deploy.php`, and a deploy overrides it with `-o purge=hard`. The modes and the
+setup are documented in [`purge.php`](purge.php).
+
+To purge a live site without deploying, run the task on its own from the site's
+checkout. It uses the site's own `purge_tasks`, so the same command covers
+Kinsta, Cloudflare and Fastly:
+
+```sh
+vendor/bin/dep cache:purge production -o purge=hard
+```
+
+Across many sites, run it in each checkout; a site without `purge.php` has no
+`cache:purge` task and fails, which marks it as one to migrate. After a
+dependency rollout that changes markup (a form plugin's hidden fields, say),
+purge `hard`: a soft purge can serve the old page once more per URL.
 
 ### Provided commands
 

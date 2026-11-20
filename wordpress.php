@@ -80,8 +80,10 @@ task('wp:update', function () {
 
         info("wp $args");
         // Not best-effort: a pending database upgrade locks editors out of
-        // wp-admin, so fail the deploy where it can be seen.
-        writeln(run("cd {{deploy_path}}/current/web && {{bin/wp}} $args"));
+        // wp-admin, so fail the deploy where it can be seen. On a network
+        // `--network` boots WordPress once per site, which can outlast the
+        // default 300 s.
+        writeln(run("cd {{deploy_path}}/current/web && {{bin/wp}} $args", timeout: 1800));
     }
 });
 

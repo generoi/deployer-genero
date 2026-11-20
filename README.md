@@ -144,6 +144,37 @@ Across many sites, run it in each checkout; a site without `purge.php` has no
 dependency rollout that changes markup (a form plugin's hidden fields, say),
 purge `hard`: a soft purge can serve the old page once more per URL.
 
+### Database updates on deploy
+
+`wp:update` in `wordpress.php` runs the WP-CLI commands in `wp_update_commands`,
+by default `wp core update-db`, so a WordPress core update no longer needs a
+manual `wp core update-db` on each environment. On a multisite network it adds
+`--network` and upgrades every site. Each command is a no-op when the database
+is current, so it is safe on every deploy. Hook it in `deploy.php` after the
+symlink and before the cache clearing:
+
+```php
+after('deploy:symlink', 'wp:update');
+after('deploy:symlink', 'cache:clear');
+```
+
+After the symlink because WordPress upgrades the database from the new code,
+the way `wp-admin/upgrade.php` does; the old code keeps working against the old
+schema until then. Before `cache:clear` so the caches are rebuilt and pages
+purged against the upgraded database. A failed command fails the deploy: the
+release is already live but wp-admin asks for a database update, so fix the
+cause and run `vendor/bin/dep wp:update production` and `vendor/bin/dep
+cache:clear production`, or redeploy.
+
+A site adds its own commands, each one that must also be a no-op when there is
+nothing to do. A string runs as is, on a network for the main site only; an
+entry `['cmd' => '…', 'network' => '…']` appends `network` on a multisite
+network, as the default `core update-db --network` does:
+
+```php
+add('wp_update_commands', ['wc update']);
+```
+
 ### Provided commands
 
 ```sh
@@ -166,4 +197,7 @@ purge `hard`: a soft purge can serve the old page once more per URL.
 
  scaffold
   scaffold:env
+
+ wp
+  wp:update                   Run the database updates the deployed code needs
 ```

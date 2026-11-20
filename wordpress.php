@@ -48,6 +48,45 @@ task('cache:clear:kinsta', function () {
     }
 });
 
+/**
+ * WP-CLI commands that bring the database up to the deployed code, run by
+ * `wp:update` in the order given. A string runs as is; an entry with `network`
+ * appends those arguments on a multisite network, so every site is upgraded:
+ *
+ *     add('wp_update_commands', ['wc update']);
+ *
+ * Each command must be a no-op when there is nothing to do, since this runs on
+ * every deploy.
+ */
+set('wp_update_commands', [
+    ['cmd' => 'core update-db', 'network' => '--network'],
+]);
+
+desc('Run the database updates the deployed code needs');
+task('wp:update', function () {
+    $network = test('cd {{deploy_path}}/current/web && {{bin/wp}} core is-installed --network');
+
+    info('wp:update: '.($network ? 'multisite network' : 'single site'));
+
+    foreach (get('wp_update_commands') as $command) {
+        if (is_string($command)) {
+            $command = ['cmd' => $command];
+        }
+
+        $args = $command['cmd'];
+        if ($network && ! empty($command['network'])) {
+            $args .= ' '.$command['network'];
+        }
+
+        info("wp $args");
+        // Not best-effort: a pending database upgrade locks editors out of
+        // wp-admin, so fail the deploy where it can be seen. On a network
+        // `--network` boots WordPress once per site, which can outlast the
+        // default 300 s.
+        writeln(run("cd {{deploy_path}}/current/web && {{bin/wp}} $args", timeout: 1800));
+    }
+});
+
 task('scaffold:env', function () {
     if (test('[ -f {{deploy_path}}/shared/.env ]')) {
         $confirm = askConfirmation('Environment file already exists, are you usre you want to rewrite it?');
